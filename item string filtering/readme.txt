@@ -1,0 +1,1 @@
+Remove unnecessary data for deco strings

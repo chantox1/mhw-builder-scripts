@@ -1,0 +1,9 @@
+# VSCode settings #
+.vscode/*
+
+# Input #
+*/in/*
+*/tree_data/*
+
+# Output #
+*/out/*

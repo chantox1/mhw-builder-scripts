@@ -70,15 +70,15 @@ class TreeData:
             return None
 
         for wep in wep_data[wep_type].values():
-            if wep['Index'] == index:
+            if wep['index'] == index:
                 return wep
         return None
 
     def is_final(self, wep_data, wep_type, wep_id):
         wep = wep_data[wep_type][wep_id]
-        wep_index = wep['Index']
+        wep_index = wep['index']
         create, upgrade = self.get_entries(wep_type, wep_index)
-        if wep['Rarity'] > 8:
+        if wep['rarity'] > 8:
             if upgrade is None:
                 return True
             return not self.upgrade_has_children(upgrade)
@@ -87,7 +87,7 @@ class TreeData:
                 return True
             for c_index in upgrade['Children']:
                 c_wep = self._get_wep_data_entry(wep_data, wep_type, c_index)
-                if c_wep is not None and c_wep['Rarity'] < 9:
+                if c_wep is not None and c_wep['rarity'] < 9:
                     return False
             return True
 
@@ -215,40 +215,40 @@ for fname in os.listdir(input_dir):
                 if size > 0:
                     slots.append(size)
 
-            wepVar1 = int(row['WepVar1'])
-            wepVar2 = int(row['WepVar2'])
+            classVar1 = int(row['WepVar1'])
+            classVar2 = int(row['WepVar2'])
             skill = int(row['Skill'])
 
             new_row = {
-                'Id': id,
-                'Index': index,
-                'Name': name,
-                'Rarity': rare,
-                'Damage': damage,
-                'Defense': defense,
-                'Affinity': aff,
-                'Slots': slots,
-                'WepVar1': wepVar1,
-                'WepVar2': wepVar2,
-                'SharpId': sharpId,
-                'SharpNo': sharpStart,
+                'id': id,
+                'index': index,
+                'name': name,
+                'rarity': rare,
+                'attack': damage,
+                'defense': defense,
+                'affinity': aff,
+                'slots': slots,
+                'classVar1': classVar1,
+                'classVar2': classVar2,
+                'sharpId': sharpId,
+                'baseSharp': sharpStart,
             }
 
-            if int(row['BaseId']) == -1:
-                new_row['Unique'] = False
-            elif int(row['BaseId']) == safi_bases[wepId][0]:
-                new_row['Safi'] = True
+            if int(row['BaseId']) != -1:
+                new_row['unique'] = True
+            if int(row['BaseId']) == safi_bases[wepId][0]:
+                new_row['safi'] = True
 
             if element != 0:
-                new_row['Element'] = element
-                new_row['ElementDmg'] = elementDmg
+                new_row['element'] = element
+                new_row['elementDmg'] = elementDmg
 
             if hiddenEle != 0:
-                new_row['HiddenEle'] = hiddenEle
-                new_row['HiddenEleDmg'] = hiddenEleDmg
+                new_row['hiddenEle'] = hiddenEle
+                new_row['hiddenEleDmg'] = hiddenEleDmg
 
             if skill != 0:
-                new_row['Skill'] = skill
+                new_row['skill'] = skill
 
             data[wepId][id] = new_row
 
@@ -256,7 +256,7 @@ temp_data = data.copy()
 for wep_type in range(0, 11):
     for wep_id in temp_data[wep_type]:
         if tree_data.is_final(data, wep_type, wep_id):
-            data[wep_type][wep_id]['Final'] = True
+            data[wep_type][wep_id]['final'] = True
 
 f_out = 'out/wepData.json'
 with open(f_out, 'w', encoding='utf-8') as f:

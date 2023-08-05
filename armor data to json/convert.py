@@ -30,8 +30,8 @@ with open(f_data, encoding='utf-8') as f:
             s_id = int(row[key[0]])
             s_lvl = int(row[key[1]])
             if s_lvl > 0:
-                skills.append([s_id, s_lvl])
-        
+                skills.append({'id': s_id, 'level': s_lvl})
+
         slot_keys = [
             'Size 1',
             'Size 2',
@@ -46,15 +46,15 @@ with open(f_data, encoding='utf-8') as f:
         
         if (stats[0] != 0 or (type == 5 and name != 0)):
             new_row = {
-                'Name': name,
-                'Rarity': rare,
-                'Type': type,
-                'Stats': stats,
-                'Skills': skills,
-                'Slots': slots
+                'name': name,
+                'rarity': rare,
+                'type': type,
+                'stats': stats,
+                'skills': skills,
+                'slots': slots
             }
             if set_skill != -1:
-                new_row['SetSkill'] = set_skill
+                new_row['setSkill'] = set_skill
 
             data[id] = new_row
 

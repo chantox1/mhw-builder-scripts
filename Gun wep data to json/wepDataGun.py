@@ -97,9 +97,36 @@ weps = {
     'LBG': 13
 }
 
+safi_bases = [
+    [24,30],
+    [25],
+    [20,26]
+]
+
+kulve_parts = [
+    [5,6,11,12],
+    [3,4,9,10],
+    [3,4,9,10]
+]
+
+kulve_raw = [
+    [50,70],
+    [40,60],
+    [40,60]
+]
+
+kulve_ele = [
+    [12,12],
+    [0,0],
+    [0,0]
+]
+ 
 crt_path = os.path.join('tree_data', 'weapon_crt.csv')
 cus_path = os.path.join('tree_data', 'weapon_cus.csv')
 tree_data = TreeData(crt_path=crt_path, cus_path=cus_path)
+
+# Aux variable to store the names of weps with only 1 safi base
+safi_base_names = [[],[],[]]
 
 input_dir = 'in'
 data = {}
@@ -115,6 +142,7 @@ for fname in os.listdir(input_dir):
         for row in csv_reader:
             if int(row['Damage']) <= 0:  # Skip dummy weapons
                 continue
+
             index = int(row['Index'])
             id = int(row['Id'])
             name = int(row['Name'])
@@ -127,7 +155,28 @@ for fname in os.listdir(input_dir):
             hiddenEle = int(row['HiddenEle'])
             hiddenEleDmg = int(row['HiddenEleDmg'])
 
-            # TODO: Kulve parts / upgrades
+            # Skip duped safi weapons
+            if len(safi_bases[wepId - 11]) == 2:
+                if int(row['BaseId']) == safi_bases[wepId - 11][1]:
+                    continue
+            else:
+                isInData = False
+                for safi_name in safi_base_names[wepId - 11]:
+                    if name == safi_name:
+                        isInData = True
+                        break
+                if not isInData:
+                    safi_base_names[wepId - 11].append(name)
+                else:
+                    continue
+
+            if (int(row['Part1']) in kulve_parts[wepId - 11] and rare > 8):
+                damage += kulve_raw[wepId - 11][rare//12]
+                if (element != 0):
+                    elementDmg += kulve_ele[wepId - 11][element//6]
+                if (hiddenEle != 0):
+                    hiddenEleDmg += kulve_ele[wepId - 11][element//6]
+                defense += 20
 
             slot_keys = [
                 'Slot1',
@@ -157,7 +206,19 @@ for fname in os.listdir(input_dir):
 
             if int(row['BaseId']) != -1:
                 new_row['unique'] = True
-            # TODO: Safi parts
+            if int(row['BaseId']) == safi_bases[wepId - 11][0]:
+                new_row['safi'] = True
+
+            if element != 0:
+                new_row['element'] = element
+                new_row['elementDmg'] = elementDmg
+
+            if hiddenEle != 0:
+                new_row['hiddenEle'] = hiddenEle
+                new_row['hiddenEleDmg'] = hiddenEleDmg
+
+            if skill != 0:
+                new_row['skill'] = skill
 
             if (wepId == 12):
                 new_row['specialAmmo'] = specialAmmo

@@ -1,9 +1,15 @@
 # VSCode settings #
 .vscode/*
 
+# Python cache #
+*/__pycache__/*
+
 # Input #
 */in/*
 */tree_data/*
 
 # Output #
 */out/*
+
+# Decrypted files #
+*/decrypted/*

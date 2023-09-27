@@ -2,6 +2,33 @@ import json
 import os
 from decrypt import decrypt
 
+dummy_quests = [
+    # 'Unavailable'
+    0,
+    1,
+    2,
+    30000,
+    30001,
+    30002,
+    30003,
+    30004,
+    30005,
+    30006,
+    30007,
+    30008,
+    30009,
+    50831,
+    51624,
+    51625,
+
+    # 'Invalid Message'
+    3,
+    4,
+    5,
+    50702,
+    50992
+]
+
 BYTE_ORDER = 'little'
 UINT32_MAX = 4294967295
 
@@ -19,7 +46,7 @@ print('decrypting...')
 decrypt(input_dir, decrypted_dir)
 
 print('processing...')
-data = []
+data = {}
 for fname in os.listdir(decrypted_dir):
     name, ext = os.path.splitext(fname)
     if ext != '.mib':
@@ -29,11 +56,14 @@ for fname in os.listdir(decrypted_dir):
     if not os.path.isfile(fpath):
         continue
 
+    id = int(name[-5:])
+    if id in dummy_quests:
+        print(f'Skipping dummy quest with id {id}')
+        continue
+
     with open(fpath, 'rb') as f:
         magic = f.read(4)
         buf = f.read()
-
-    id = int(name[-5:])
 
     icons = []
     icon_offset = 68
@@ -63,11 +93,12 @@ for fname in os.listdir(decrypted_dir):
 
     entry = {
         'id': id,
+        'index': len(data),
         'stars': buf[10],
         'monsters': monsters,
         'icons': icons
     }
-    data.append(entry)
+    data[id] = entry
 
 f_out = os.path.join(output_dir, 'quests.json')
 with open(f_out, 'w', encoding='utf-8') as f:

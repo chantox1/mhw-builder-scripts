@@ -2,6 +2,33 @@ import json
 import os, sys, errno
 import struct, readline0
 
+dummy_quests = [
+    # 'Unavailable'
+    0,
+    1,
+    2,
+    30000,
+    30001,
+    30002,
+    30003,
+    30004,
+    30005,
+    30006,
+    30007,
+    30008,
+    30009,
+    50831,
+    51624,
+    51625,
+
+    # 'Invalid Message'
+    3,
+    4,
+    5,
+    50702,
+    50992
+]
+
 tag_map = {
     "<ICON ALPHA>": " α",
     "<ICON BETA>": " β",
@@ -44,7 +71,8 @@ def cleanStr(string, tag_map):
 input_dir = 'in'
 output_dir = 'out'
 
-data = {}
+data_names = {}
+data_objectives = {}
 for fname in os.listdir(input_dir):
     print(f'Parsing {fname}...')
     name, ext = os.path.splitext(fname)
@@ -54,6 +82,11 @@ for fname in os.listdir(input_dir):
 
     fpath = os.path.join(input_dir, fname)
     if not os.path.isfile(fpath):
+        continue
+
+    id = int(name[1:6])
+    if id in dummy_quests:
+        print(f'Skipping dummy quest with id {id}')
         continue
 
     strings = {}
@@ -66,18 +99,20 @@ for fname in os.listdir(input_dir):
         str_offset = head_size + info_entry_size + bucket_size + key_block_size
 
         f.seek(str_offset)
-        for line in readline0.readline0(f):
-            quest_name = cleanStr(line.decode('utf-8'), tag_map)
-            break
+        for count, line in enumerate(readline0.readline0(f)):
+            strings[count] = cleanStr(line.decode('utf-8'), tag_map)
 
     lang = fname[-7:-4]
-    if not lang in data:
-        data[lang] = {}
+    if not lang in data_names:
+        data_names[lang] = {}
+    if not lang in data_objectives:
+        data_objectives[lang] = {}
 
     id = int(name[1:6])
-    data[lang][id] = quest_name
+    data_names[lang][id] = strings[0]
+    data_objectives[lang][id] = strings[1]
 
-for lang in data:
+for lang in data_names:
     output_dir_lang = os.path.join(output_dir, lang)
     try:
         os.mkdir(output_dir_lang)
@@ -87,4 +122,11 @@ for lang in data:
 
     f_out = os.path.join(output_dir_lang, 'questNames.json')
     with open(f_out, 'w', encoding='utf-8') as f:
-        f.write(json.dumps(data[lang], ensure_ascii=False, separators=(',', ':')))
+        f.write(json.dumps(data_names[lang], ensure_ascii=False, separators=(',', ':')))
+
+for lang in data_objectives:
+    output_dir_lang = os.path.join(output_dir, lang)
+
+    f_out = os.path.join(output_dir_lang, 'questObjectives.json')
+    with open(f_out, 'w', encoding='utf-8') as f:
+        f.write(json.dumps(data_objectives[lang], ensure_ascii=False, separators=(',', ':')))

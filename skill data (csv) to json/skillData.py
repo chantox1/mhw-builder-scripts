@@ -61,6 +61,6 @@ for row in data:
         new_row = concat_data(row, data)
         filtered_data[id] = new_row
 
-f_out = 'out/data.json'
+f_out = 'out/skills.json'
 with open(f_out, 'w', encoding='utf-8') as f:
     f.write(json.dumps(filtered_data, ensure_ascii=False, separators=(',', ':')))

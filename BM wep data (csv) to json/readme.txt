@@ -1,1 +1,1 @@
-Transforms weapon .csv data to a singular data.json file - currently only considers blademaster weapons.
+Transforms weapon .csv data to a singular wepDataBM.json file

@@ -258,6 +258,6 @@ for wep_type in range(0, 11):
         if tree_data.is_final(data, wep_type, wep_id):
             data[wep_type][wep_id]['final'] = True
 
-f_out = 'out/wepData.json'
+f_out = 'out/wepDataBM.json'
 with open(f_out, 'w', encoding='utf-8') as f:
     f.write(json.dumps(data, ensure_ascii=False, separators=(',', ':')))
